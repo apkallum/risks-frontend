@@ -10,9 +10,19 @@
 </b-row>
 
 <b-row class="my-1" v-for="(field, index) in currentRiskType.RiskTypeGenericField" :key="index">
-    <b-col sm="5"><b-input :value="field.FieldTitle"></b-input></b-col>
+    <b-col sm="5"><b-input v-model="field.FieldTitle"></b-input></b-col>
     <b-col sm="7"><b-input :id="`type-${field.Type.toLowerCase()}`" :type="field.Type.toLowerCase()" :value="getValueOfField(field)"></b-input></b-col>
 </b-row>
+<br><br>
+<b-row>
+<b-btn-group>
+<b-button>Add Text Field</b-button>
+<b-button>Add Number Field</b-button>
+<b-button>Add Date Field</b-button>
+<b-button>Add Enum Field</b-button>
+</b-btn-group>
+</b-row>
+<br><br>
 </b-container>
 </template>
 
@@ -22,7 +32,9 @@ import axios from 'axios';
         data () {
             return {
                     allRiskTypes: [],
-                    currentRiskType: {}
+                    currentRiskType: {},
+                    RiskTypeFieldValue: 'RiskTypeFieldValue'
+
             }
         },
         methods: {
@@ -47,18 +59,40 @@ import axios from 'axios';
                     }
                 )
             },
-               
+            getNameOfFieldValue: function(Type) {
+                if (Type === 'Text') {
+                    return 'RiskTypeTextFieldValue';
+                }
+                if (Type === 'Number') {
+                    return 'RiskTypeNumberFieldValue';
+                }
+                if (Type === 'Date') {
+                    return 'RiskTypeDateFieldValue';
+                }
+                if (Type === 'Enum') {
+                    return 'RiskTypeEnumFieldValue';
+                }
+            },
+            unifyFieldValueNames: function(allRiskTypes){
+                for (var i = 0, len1 = allRiskTypes.length; i < len1; i++) {
+                    for (var j = 0, len2 = allRiskTypes[i].length; j < len2; j++) {
+                        allRiskTypes[i].RiskTypeGenericField[j][RiskTypeFieldValue] = allRiskTypes[i].RiskTypeGenericField[j][getNameOfFieldValue(allRiskTypes[i].RiskTypeGenericField[j].Type)]
+                        delete allRiskTypes[i].RiskTypeGenericField[j][getNameOfFieldValue(allRiskTypes[i].RiskTypeGenericField[j].Type)]    
+                    }
+                }                
+            }    
         },
-        // Add method to extract all riskObjects from API response 
         created () {
     // Assuming a logged in user return their RiskTypes & associated RiskTypeFields
-    axios.get('http://backend.bcoreproject.info/api/risktype/?format=json')
-   .then(response => this.allRiskTypes = response.data)
+            axios.get('http://backend.bcoreproject.info/api/risktype/?format=json')
+            .then(response => this.allRiskTypes = response.data)
 
-//  .then(response => console.log(response.data))
+  },
+        mounted () {
+            this.unifyFieldValueNames(this.allRiskTypes)
+            }
 
-  }
-                
+            
     }
            
        
