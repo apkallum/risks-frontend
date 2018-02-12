@@ -2,7 +2,7 @@
 <b-container fluid>
 <b-row>
  <b-dropdown id="ddown1" text="Select Risk Type" class="m-sm-2">
-<b-dropdown-item v-for="(riskType, index) in allRiskTypes" :key="index" :value="riskType.Title" @click="currentRiskType = riskType">
+<b-dropdown-item v-for="(riskType, index) in allRiskTypes" :key="index" :value="riskType.Title" @click="currentRiskType = riskType, defaultRiskTitleVisibility = true">
 {{riskType.Title}}
 </b-dropdown-item>
  </b-dropdown>
@@ -13,11 +13,11 @@
 <b-dropdown-item @click="addNewFieldToRisk(currentRiskType, 'Enum')">Add Enum Field</b-dropdown-item>
 </b-dropdown>
 <br>
-<b-button variant="primary" size="lg" class="m-sm-2">Add New Risk Type</b-button>
+<b-button variant="primary" size="lg" class="m-sm-2" @click="addNewRiskType(allRiskTypes), defaultRiskTitleVisibility = true, currentRiskType = allRiskTypes.slice(-1)[0]">Add New Risk Type</b-button>
 </b-row>
-
+<br>
 <b-row>
-<div class="m-sm-2" v-if="currentRiskType"><strong>{{currentRiskType.Title}}</strong></div>
+<b-col m="4"><b-input v-show="defaultRiskTitleVisibility"  v-model="currentRiskType.Title" placeholder="Risk Title"></b-input></b-col>
 </b-row>
 
 <b-row class="my-1" v-for="(field, index) in currentRiskType.RiskTypeGenericType" :key="index">
@@ -36,7 +36,7 @@ import axios from 'axios';
             return {
                     allRiskTypes: [],
                     currentRiskType: {},
-                    RiskTypeFieldValue: 'RiskTypeFieldValue'
+                    defaultRiskTitleVisibility: false
 
             }
         },
@@ -49,7 +49,15 @@ import axios from 'axios';
                         'FieldValue': ''
                     }
                 )
-            },    
+            },
+            addNewRiskType: (allRiskTypes) => {
+                allRiskTypes.push (
+                    {
+                    'Title': '',
+                    'RiskTypeGenericType': []
+                    }
+                )
+            }    
         },
         created () {
     // Assuming a logged in user return their RiskTypes & associated RiskTypeFields
