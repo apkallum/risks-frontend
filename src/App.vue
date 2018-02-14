@@ -17,7 +17,7 @@ export default {
         'app-footer': Footer
 
     },
-  name: 'app',
+  name: 'app', 
   data () {
     return {
 
