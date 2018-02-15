@@ -47,7 +47,8 @@
 <b-row v-for="(field, index) in currentRiskType.RiskTypeGenericType" :key="index">
     <b-col m="4">{{field.FieldTitle}}</b-col>
     <template v-if="field.TypeAsText === 'enum'">
-     <b-col m="8"><b-dropdown text="Select Enum Value">
+      <div style="display:none">{{commaSeperatedToEnum(field.FieldValue)}}</div>
+     <b-col m="8"><b-dropdown @click="commaSeperatedToEnum(field.FieldValue)" text="Select Enum Value">
         <b-dropdown-item  v-for="(enumItem, index) in enumResult" :key="index">{{enumItem}}</b-dropdown-item>
         </b-dropdown>
         </b-col>
@@ -95,11 +96,13 @@ export default {
       riskObject.RiskTypeGenericType.splice(index, 1);
     },
     commaSeperatedToEnum: function(value) {
+        if (typeof(value) === 'object'){
+          this.enumResult = value
+        }
+        else {
         this.enumResult = value.split(',')
-      }
-
-    
-
+        }
+      },
   },
   created() {
     // Assuming a logged in user return their RiskTypes & associated RiskTypeFields
